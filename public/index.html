@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>apply.ai — tailored applications, honest narrative</title>
+<meta name="description" content="Your CV deserves to be read. apply.ai tailors your cover letter and CV to each role, formats it to pass screening software, and tells you honestly where you fall short.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0; --surface: #FFFFFF; --ink: #1A1814; --ink-2: #6B6860; --ink-3: #A8A6A2;
+    --accent: #C84B2F; --accent-light: #F7EDE9; --border: #E2DFD8; --border-strong: #C5C2BA;
+    --green: #2D6A4F; --green-light: #EAF3DE; --radius: 12px; --radius-sm: 6px;
+    --blue: #0A66C2; --blue-light: #EBF3FB;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+  .app { max-width: 680px; margin: 0 auto; padding: 36px 16px 80px; }
+  .header { margin-bottom: 36px; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--ink); letter-spacing: -0.5px; margin-bottom: 6px; }
+  .logo span { color: var(--accent); font-style: italic; }
+  .intro { font-size: 15px; color: var(--ink-2); line-height: 1.7; margin-top: 12px; max-width: 560px; }
+  .intro strong { color: var(--ink); font-weight: 500; }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
+  .step.done { border-color: var(--green); background: #FAFFF9; }
+  .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--ink-2); flex-shrink: 0; }
+  .step.done .step-num { background: var(--green); border-color: var(--green); color: white; font-size: 13px; }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .upload-zone { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 28px 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg); }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: var(--accent-light); }
+  .upload-icon { width: 36px; height: 36px; margin: 0 auto 10px; opacity: 0.4; }
+  .upload-text { font-size: 14px; color: var(--ink-2); }
+  .upload-sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+  .file-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--green-light); color: var(--green); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 13px; font-weight: 500; }
+  input[type="file"] { display: none; }
+  .linkedin-hint { display: flex; align-items: flex-start; gap: 10px; background: var(--blue-light); border: 1px solid #B8D4EE; border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 10px; }
+  .linkedin-hint-body { font-size: 12px; color: #0A4A8C; line-height: 1.6; }
+  .linkedin-hint-body strong { font-weight: 500; }
+  .linkedin-steps { margin-top: 5px; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .linkedin-steps li { font-size: 12px; color: #0A4A8C; padding-left: 14px; position: relative; }
+  .linkedin-steps li::before { content: '→'; position: absolute; left: 0; opacity: 0.6; }
+  .hint { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+  .url-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .url-input { flex: 1; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--bg); outline: none; transition: border-color 0.2s; min-width: 0; }
+  .url-input:focus { border-color: var(--border-strong); background: white; }
+  .btn-sm { border: 1px solid var(--border-strong); background: white; color: var(--ink); border-radius: var(--radius-sm); padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn-sm:hover { background: var(--bg); }
+  .divider { text-align: center; font-size: 12px; color: var(--ink-3); margin: 8px 0; position: relative; }
+  .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 44%; height: 1px; background: var(--border); }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+  textarea { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--bg); resize: vertical; outline: none; transition: border-color 0.2s; line-height: 1.6; }
+  textarea:focus { border-color: var(--border-strong); background: white; }
+  .char-count { font-size: 11px; color: var(--ink-3); text-align: right; margin-top: 4px; }
+  .tone-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  @media (max-width: 400px) { .tone-grid { grid-template-columns: 1fr; } }
+  .tone-btn { border: 1px solid var(--border); background: var(--bg); border-radius: var(--radius-sm); padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-2); min-height: 48px; }
+  .tone-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .tone-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+  .tone-label { font-size: 13px; font-weight: 500; display: block; }
+  .tone-desc { font-size: 11px; color: var(--ink-3); margin-top: 2px; display: block; }
+  .tone-btn.selected .tone-desc { color: var(--accent); opacity: 0.7; }
+  .lang-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .lang-section-label { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+  .lang-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .lang-btn { border: 1px solid var(--border); background: var(--bg); border-radius: 20px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink-2); cursor: pointer; transition: all 0.15s; white-space: nowrap; min-height: 32px; }
+  .lang-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+  .lang-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+  .output-preview-wrap { margin-top: 20px; }
+  .output-preview-label { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+  .output-preview { display: flex; gap: 6px; flex-wrap: wrap; }
+  .output-pill { display: flex; align-items: center; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 5px 10px; font-size: 12px; color: var(--ink-2); }
+  .generate-btn { width: 100%; background: var(--ink); color: white; border: none; border-radius: var(--radius-sm); padding: 16px 24px; font-family: 'DM Serif Display', serif; font-size: 18px; cursor: pointer; transition: all 0.2s; margin-top: 16px; letter-spacing: 0.3px; min-height: 54px; }
+  .generate-btn:hover { background: var(--accent); }
+  .generate-btn:disabled { background: var(--ink-3); cursor: not-allowed; }
+  .loading { display: none; text-align: center; padding: 40px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 12px; }
+  .loading.visible { display: block; }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 14px; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--ink-2); }
+  .loading-sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+  .results { display: none; margin-top: 20px; }
+  .results.visible { display: block; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .results-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); }
+  .tab-row { display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; margin-bottom: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab { flex: 1; min-width: 100px; padding: 8px 10px; border-radius: 4px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-2); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .tab.active { background: white; color: var(--ink); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .output-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; padding-top: 44px; font-size: 14px; line-height: 1.8; color: var(--ink); white-space: pre-wrap; word-wrap: break-word; min-height: 160px; position: relative; }
+  .copy-btn { position: absolute; top: 10px; right: 10px; border: 1px solid var(--border-strong); background: white; color: var(--ink-2); border-radius: var(--radius-sm); padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .copy-btn:hover { color: var(--ink); }
+  .ats-note { display: flex; align-items: flex-start; gap: 8px; background: var(--green-light); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: var(--green); line-height: 1.5; }
+  .cv-editor { display: flex; flex-direction: column; gap: 12px; }
+  .cv-section { background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .cv-section-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .cv-section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); }
+  .ats-badge { font-size: 10px; background: var(--green-light); color: var(--green); padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+  .cv-section textarea { border: none; border-radius: 0; background: white; padding: 12px 14px; font-size: 13px; line-height: 1.7; min-height: 72px; }
+  .cv-section textarea:focus { background: #FFFEF9; }
+  .gap-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px; background: white; }
+  .gap-item.hard { border-left: 3px solid #E24B4A; }
+  .gap-item.medium { border-left: 3px solid #EF9F27; }
+  .gap-item.light { border-left: 3px solid #639922; }
+  .gap-title { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+  .gap-body { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.hard { background: #FCEBEB; color: #A32D2D; }
+  .badge.medium { background: #FAEEDA; color: #854F0B; }
+  .badge.light { background: #EAF3DE; color: #3B6D11; }
+  .download-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .download-btn { flex: 1; min-width: 130px; border: 1px solid var(--border-strong); background: white; color: var(--ink); border-radius: var(--radius-sm); padding: 11px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
+  .download-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
+  .download-btn.primary-dl { background: var(--ink); color: white; border-color: var(--ink); }
+  .download-btn.primary-dl:hover { background: var(--accent); border-color: var(--accent); }
+  .pdf-hint { font-size: 12px; color: var(--ink-3); margin-top: 8px; line-height: 1.5; }
+  .reset-btn { border: none; background: none; color: var(--ink-3); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; padding: 4px 0; transition: color 0.15s; }
+  .reset-btn:hover { color: var(--accent); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,24,20,0.6); display: flex; align-items: flex-end; justify-content: center; z-index: 100; padding: 0; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  @media (min-width: 500px) { .modal-overlay { align-items: center; padding: 24px; } }
+  .modal-overlay.visible { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; border: 1px solid var(--border); width: 100%; max-width: 500px; padding: 28px 20px 36px; transform: translateY(20px); transition: transform 0.25s; max-height: 90vh; overflow-y: auto; }
+  @media (min-width: 500px) { .modal { border-radius: var(--radius); transform: translateY(8px); } }
+  .modal-overlay.visible .modal { transform: translateY(0); }
+  .modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 20px; }
+  @media (min-width: 500px) { .modal-handle { display: none; } }
+  .modal-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); margin-bottom: 10px; }
+  .modal-body { font-size: 14px; color: var(--ink-2); line-height: 1.7; }
+  .modal-facts { margin: 16px 0; display: flex; flex-direction: column; gap: 10px; }
+  .modal-fact { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .fact-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 6px; }
+  .fact-dot.amber { background: #EF9F27; }
+  .modal-note { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--ink-3); line-height: 1.6; margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 8px; }
+  .btn-primary { flex: 1; background: var(--ink); color: white; border: none; border-radius: var(--radius-sm); padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; min-height: 48px; }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-secondary { border: 1px solid var(--border-strong); background: white; color: var(--ink-2); border-radius: var(--radius-sm); padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.15s; min-height: 48px; }
+  .btn-secondary:hover { color: var(--ink); }
+  .privacy-link { font-size: 11px; color: var(--ink-3); text-align: center; margin-top: 10px; display: block; }
+  .privacy-link a { color: var(--ink-3); text-decoration: underline; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-3); text-align: center; line-height: 1.8; }
+  footer a { color: var(--ink-3); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="modal-overlay visible" id="privacy-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2L3 5v5c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V5l-7-3z" stroke="#2D6A4F" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7 10l2 2 4-4" stroke="#2D6A4F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="modal-title">How we handle your data</div>
+    <div class="modal-body">Your CV contains personal information. Here is exactly what happens to it.</div>
+    <div class="modal-facts">
+      <div class="modal-fact"><div class="fact-dot"></div><span>We never store your data. No database, no backend, no analytics.</span></div>
+      <div class="modal-fact"><div class="fact-dot"></div><span>Your CV and job description are sent to Anthropic's API only to generate your output. Not retained by this app.</span></div>
+      <div class="modal-fact"><div class="fact-dot amber"></div><span>Anthropic may retain API inputs for up to 30 days for trust and safety purposes. By continuing, you acknowledge this.</span></div>
+    </div>
+    <div class="modal-note">This app is backend-free today. If that ever changes, this notice will be updated first.</div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="declinePrivacy()">No thanks</button>
+      <button class="btn-primary" onclick="acceptPrivacy()">I understand, continue</button>
+    </div>
+    <div class="privacy-link"><a href="https://www.anthropic.com/privacy" target="_blank">Anthropic privacy policy</a></div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="header">
+    <div class="logo">apply<span>.ai</span></div>
+    <p class="intro">Your CV deserves to be read. <strong>apply.ai</strong> tailors your cover letter and CV to each role, formats it to pass screening software, and tells you honestly where you fall short — and how to close the gap.</p>
+  </div>
+
+  <div class="step" id="step1">
+    <div class="step-header"><div class="step-num" id="num1">1</div><div class="step-title">Your CV</div></div>
+    <div id="upload-area">
+      <div class="upload-zone" id="drop-zone" onclick="triggerUpload()">
+        <svg class="upload-icon" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#E2DFD8"/><path d="M20 12v12M14 18l6-6 6 6M12 28h16" stroke="#6B6860" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="upload-text">Tap to upload your CV</div>
+        <div class="upload-sub">PDF accepted</div>
+      </div>
+      <div class="linkedin-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2" style="flex-shrink:0;margin-top:1px">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+        <div class="linkedin-hint-body">
+          <strong>No CV yet?</strong> Export yours from LinkedIn as a PDF and upload it here.
+          <ul class="linkedin-steps">
+            <li>Go to your LinkedIn profile</li>
+            <li>Click "More" then "Save to PDF"</li>
+            <li>Upload the downloaded file above</li>
+          </ul>
+        </div>
+      </div>
+      <input type="file" id="cv-file" accept=".pdf,.txt">
+      <p class="hint">Your CV stays on your device until you generate.</p>
+    </div>
+    <div id="cv-done" style="display:none">
+      <div class="file-badge">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="#2D6A4F" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span id="cv-filename">cv.pdf</span>
+      </div>
+      <button class="reset-btn" onclick="resetCV()" style="margin-left:12px">Change file</button>
+    </div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="step-header"><div class="step-num" id="num2">2</div><div class="step-title">Job description</div></div>
+    <div class="url-row">
+      <input type="text" class="url-input" id="jd-url" placeholder="Job URL (not LinkedIn)" autocomplete="off">
+      <button class="btn-sm" id="fetch-btn" onclick="fetchURL()">Fetch</button>
+    </div>
+    <div class="divider">or paste directly</div>
+    <textarea id="jd-text" rows="7" placeholder="Paste the job description here..."></textarea>
+    <div class="char-count"><span id="char-count">0</span> characters</div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="step-header"><div class="step-num" id="num3">3</div><div class="step-title">Tone and language</div></div>
+    <div class="tone-grid">
+      <button class="tone-btn selected" data-tone="confident" onclick="selectTone(this)"><span class="tone-label">Confident</span><span class="tone-desc">Direct, no hedging</span></button>
+      <button class="tone-btn" data-tone="warm" onclick="selectTone(this)"><span class="tone-label">Warm</span><span class="tone-desc">Human, personal</span></button>
+      <button class="tone-btn" data-tone="formal" onclick="selectTone(this)"><span class="tone-label">Formal</span><span class="tone-desc">Structured, precise</span></button>
+    </div>
+    <div class="lang-section">
+      <div class="lang-section-label">Output language</div>
+      <div class="lang-row">
+        <button class="lang-btn selected" data-prompt="Match the language of the job description exactly." onclick="selectLang(this)">Match JD</button>
+        <button class="lang-btn" data-prompt="Write in English." onclick="selectLang(this)">English</button>
+        <button class="lang-btn" data-prompt="Write in European Portuguese as used in Portugal. Use formal register, European spelling and vocabulary. Avoid Brazilian expressions." onclick="selectLang(this)">Portuguese (PT)</button>
+        <button class="lang-btn" data-prompt="Write in Brazilian Portuguese as used in Brazil. Use natural Brazilian register, vocabulary and spelling conventions." onclick="selectLang(this)">Portuguese (BR)</button>
+        <button class="lang-btn" data-prompt="Write in Spanish." onclick="selectLang(this)">Spanish</button>
+        <button class="lang-btn" data-prompt="Write in French." onclick="selectLang(this)">French</button>
+        <button class="lang-btn" data-prompt="Write in German." onclick="selectLang(this)">German</button>
+        <button class="lang-btn" data-prompt="Write in Italian." onclick="selectLang(this)">Italian</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="output-preview-wrap">
+    <div class="output-preview-label">What you will get:</div>
+    <div class="output-preview">
+      <div class="output-pill"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M3 4h6M3 6h6M3 8h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Cover letter</div>
+      <div class="output-pill"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>ATS-ready CV</div>
+      <div class="output-pill"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v4l2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/></svg>Gap analysis</div>
+    </div>
+  </div>
+
+  <button class="generate-btn" id="gen-btn" onclick="generate()">Generate application materials</button>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">Reading your CV and the role...</div>
+    <div class="loading-sub">About 20 to 30 seconds</div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-header">
+      <div class="results-title">Your application</div>
+      <button class="reset-btn" onclick="resetAll()">Start over</button>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('cover')">Cover letter</button>
+      <button class="tab" onclick="switchTab('cv')">ATS-ready CV</button>
+      <button class="tab" onclick="switchTab('gaps')">Gap analysis</button>
+    </div>
+    <div class="tab-panel active" id="tab-cover">
+      <div class="output-box" id="out-cover">
+        <button class="copy-btn" onclick="copyText('out-cover')">Copy</button>
+        <span id="cover-text"></span>
+      </div>
+      <div class="download-row">
+        <button class="download-btn primary-dl" onclick="downloadCoverDocx()">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Download .docx
+        </button>
+        <button class="download-btn" onclick="downloadTxt()">Download .txt</button>
+      </div>
+      <p class="pdf-hint">To save as PDF: open in Word or Google Docs and export from there.</p>
+    </div>
+    <div class="tab-panel" id="tab-cv">
+      <div class="ats-note">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M7 1L1 4v4c0 3 2 5.5 6 6.5 4-1 6-3.5 6-6.5V4L7 1z" stroke="#2D6A4F" stroke-width="1.2"/><path d="M4.5 7l2 2 3-3" stroke="#2D6A4F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Single column, standard headers, no tables or images. Edit each section before downloading.
+      </div>
+      <div class="cv-editor" id="cv-editor"></div>
+      <div class="download-row">
+        <button class="download-btn primary-dl" onclick="downloadCVDocx()">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Download ATS .docx
+        </button>
+        <button class="download-btn" onclick="downloadCVTxt()">Download .txt</button>
+      </div>
+      <p class="pdf-hint">Most ATS accept both .docx and PDF. Check the job posting before sending.</p>
+    </div>
+    <div class="tab-panel" id="tab-gaps">
+      <div id="gaps-list"></div>
+    </div>
+  </div>
+
+  <footer>
+    Built with honesty in mind. No data stored. No fluff.<br>
+    <a href="https://www.anthropic.com/privacy" target="_blank">Anthropic privacy policy</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script>
+<script>
+let cvText='', selectedTone='confident', selectedLangPrompt='Match the language of the job description exactly.';
+let generatedCover='', cvSections={}, privacyAccepted=false;
+const CV_KEYS=['summary','experience','skills','education','certifications','languages'];
+const CV_LABELS={summary:'Summary',experience:'Experience',skills:'Skills',education:'Education',certifications:'Certifications',languages:'Languages'};
+const dropZone=document.getElementById('drop-zone'),cvFile=document.getElementById('cv-file'),jdTA=document.getElementById('jd-text');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag');handleFile(e.dataTransfer.files[0]);});
+cvFile.addEventListener('change',e=>handleFile(e.target.files[0]));
+jdTA.addEventListener('input',()=>{document.getElementById('char-count').textContent=jdTA.value.length;});
+function acceptPrivacy(){privacyAccepted=true;document.getElementById('privacy-modal').classList.remove('visible');}
+function declinePrivacy(){document.getElementById('privacy-modal').classList.remove('visible');}
+function triggerUpload(){if(!privacyAccepted){document.getElementById('privacy-modal').classList.add('visible');return;}cvFile.click();}
+async function handleFile(file){
+  if(!file)return;
+  document.getElementById('cv-filename').textContent=file.name;
+  document.getElementById('upload-area').style.display='none';
+  document.getElementById('cv-done').style.display='block';
+  document.getElementById('step1').classList.add('done');
+  document.getElementById('num1').textContent='✓';
+  if(file.type==='application/pdf'){const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});cvText='__PDF__'+b64;}
+  else{cvText=await file.text();}
+}
+function resetCV(){cvText='';cvFile.value='';document.getElementById('upload-area').style.display='block';document.getElementById('cv-done').style.display='none';document.getElementById('step1').classList.remove('done');document.getElementById('num1').textContent='1';}
+function selectTone(btn){document.querySelectorAll('.tone-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedTone=btn.dataset.tone;}
+function selectLang(btn){document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedLangPrompt=btn.dataset.prompt;}
+async function fetchURL(){
+  const url=document.getElementById('jd-url').value.trim();if(!url)return;
+  const btn=document.getElementById('fetch-btn');btn.textContent='Fetching...';btn.disabled=true;
+  try{const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Extract only the job description text from this URL: ${url}. Return only raw text.`}]})});const data=await res.json();const text=data.content?.map(c=>c.text||'').join('');if(text){jdTA.value=text;document.getElementById('char-count').textContent=text.length;}}
+  catch(e){jdTA.placeholder='Could not fetch. Please paste manually.';}
+  btn.textContent='Fetch';btn.disabled=false;
+}
+async function generate(){
+  const jd=jdTA.value.trim();
+  if(!cvText){alert('Please upload your CV first.');return;}
+  if(!jd){alert('Please add a job description.');return;}
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('gen-btn').disabled=true;
+  const msgs=['Reading your CV and the role...','Identifying your strongest angles...','Drafting your cover letter...','Building ATS-ready CV...','Running gap analysis...'];
+  let li=0;const lt=setInterval(()=>{li=(li+1)%msgs.length;document.getElementById('loading-text').textContent=msgs[li];},4000);
+  const tones={confident:'Direct and confident. No hedging. State things as facts. Short sentences.',warm:'Warm and human. Personal where relevant. Conversational but professional.',formal:'Formal and structured. Precise language. No contractions.'};
+  const prompt=`You are an expert career coach and ATS specialist. Given the candidate's CV and a job description, produce three outputs.\n\nTONE: ${tones[selectedTone]}\nLANGUAGE: ${selectedLangPrompt}\n\nRULES:\n- Never invent facts. Only reframe what is in the CV.\n- Be honest about gaps.\n- No em dashes. No filler phrases.\n- Apply the language instruction to ALL outputs.\n- ATS CV: plain text only. No markdown, asterisks, or special characters. Each experience entry: Title, Company, Dates on one line, then bullet points on separate lines starting with a hyphen. Mirror keywords from the JD naturally.\n\nRespond with exactly this JSON, nothing else:\n{\n  "cover_letter": "full cover letter, no markdown",\n  "cv": {\n    "summary": "2-3 sentence summary tailored to this role",\n    "experience": "Title, Company, Dates\\n- achievement\\n- achievement\\n\\nTitle, Company, Dates\\n- achievement",\n    "skills": "relevant skills, one per line, keywords from JD included",\n    "education": "Degree, Institution, Year",\n    "certifications": "Certification, Issuer, Year",\n    "languages": "Language (Level)"\n  },\n  "gaps": [\n    { "title": "gap title", "severity": "hard|medium|light", "description": "what the gap is", "how_to_address": "concrete steps" }\n  ]\n}\n\nJOB DESCRIPTION:\n${jd}`;
+  try{
+    const body=cvText.startsWith('__PDF__')?{model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:cvText.replace('__PDF__','')}},{type:'text',text:prompt}]}]}:{model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:`CV:\n${cvText}\n\n${prompt}`}]};
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    const raw=data.content?.map(c=>c.text||'').join('');
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    generatedCover=parsed.cover_letter||'';cvSections=parsed.cv||{};
+    document.getElementById('cover-text').textContent=generatedCover;
+    renderCVEditor(cvSections);
+    const gl=document.getElementById('gaps-list');gl.innerHTML='';
+    (parsed.gaps||[]).forEach(g=>{const div=document.createElement('div');div.className=`gap-item ${g.severity}`;div.innerHTML=`<div class="badge ${g.severity}">${g.severity==='hard'?'Real gap':g.severity==='medium'?'Partial gap':'Minor gap'}</div><div class="gap-title">${g.title}</div><div class="gap-body">${g.description}<br><br><strong>How to address:</strong> ${g.how_to_address}</div>`;gl.appendChild(div);});
+    clearInterval(lt);document.getElementById('loading').classList.remove('visible');document.getElementById('results').classList.add('visible');
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){clearInterval(lt);document.getElementById('loading').classList.remove('visible');alert('Something went wrong. Please try again.');}
+  document.getElementById('gen-btn').disabled=false;
+}
+function renderCVEditor(sections){
+  const editor=document.getElementById('cv-editor');editor.innerHTML='';
+  CV_KEYS.forEach(key=>{const val=sections[key]||'';const div=document.createElement('div');div.className='cv-section';div.innerHTML=`<div class="cv-section-header"><span class="cv-section-label">${CV_LABELS[key]}</span><span class="ats-badge">ATS safe</span></div><textarea id="cv-field-${key}" rows="${key==='experience'?8:key==='summary'?3:4}">${val}</textarea>`;editor.appendChild(div);});
+}
+function getSections(){const out={};CV_KEYS.forEach(k=>{const el=document.getElementById(`cv-field-${k}`);out[k]=el?el.value:'';});return out;}
+function switchTab(name){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['cover','cv','gaps'][i]===name));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');}
+function copyText(id){const el=document.getElementById(id);navigator.clipboard.writeText(el.querySelector('span')?.textContent||'').then(()=>{const btn=el.querySelector('.copy-btn');btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);});}
+function downloadTxt(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([generatedCover],{type:'text/plain'}));a.download='cover_letter.txt';a.click();}
+function downloadCVTxt(){const s=getSections();const content=CV_KEYS.map(k=>`${CV_LABELS[k].toUpperCase()}\n${s[k]}`).join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'}));a.download='cv_ats.txt';a.click();}
+async function downloadCoverDocx(){
+  if(!window.docx){alert('Not ready yet.');return;}
+  const{Document,Packer,Paragraph,TextRun,AlignmentType}=window.docx;
+  const paragraphs=generatedCover.split('\n').map(line=>new Paragraph({children:line.trim()===''?[]:[new TextRun({text:line,size:22,font:'Arial'})],spacing:{after:line.trim()===''?120:240},alignment:AlignmentType.JUSTIFIED}));
+  const doc=new Document({styles:{default:{document:{run:{font:'Arial',size:22}}}},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1440,right:1440,bottom:1440,left:1440}}},children:paragraphs}]});
+  const buf=await Packer.toBuffer(doc);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));a.download='cover_letter.docx';a.click();
+}
+async function downloadCVDocx(){
+  if(!window.docx){alert('Not ready yet.');return;}
+  const{Document,Packer,Paragraph,TextRun,HeadingLevel,AlignmentType}=window.docx;
+  const sections=getSections();const children=[];
+  CV_KEYS.forEach(key=>{const val=sections[key]||'';if(!val.trim())return;children.push(new Paragraph({text:CV_LABELS[key].toUpperCase(),heading:HeadingLevel.HEADING_1,spacing:{before:240,after:80},border:{bottom:{style:'single',size:4,color:'CCCCCC',space:1}}}));val.split('\n').forEach(line=>{const t=line.trim();if(!t){children.push(new Paragraph({spacing:{after:60}}));return;}const isBullet=t.startsWith('-');children.push(new Paragraph({children:[new TextRun({text:isBullet?t.slice(1).trim():t,size:20,font:'Arial'})],bullet:isBullet?{level:0}:undefined,spacing:{after:isBullet?60:100},indent:isBullet?{left:360,hanging:360}:undefined}));});});
+  const doc=new Document({styles:{default:{document:{run:{font:'Arial',size:20}}},paragraphStyles:[{id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,run:{size:22,bold:true,font:'Arial',color:'1A1814'},paragraph:{spacing:{before:240,after:80},outlineLevel:0}}]},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,right:1134,bottom:1134,left:1134}}},children}]});
+  const buf=await Packer.toBuffer(doc);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));a.download='cv_ats_ready.docx';a.click();
+}
+function resetAll(){resetCV();jdTA.value='';document.getElementById('char-count').textContent='0';document.getElementById('jd-url').value='';document.getElementById('results').classList.remove('visible');generatedCover='';cvSections={};}
+</script>
+</body>
+</html>
